@@ -2,7 +2,7 @@ module.exports = (grunt) ->
   grunt.initConfig
     coffee:
       compile:
-        cwd: "src/coffee"
+        cwd: "client/coffee"
         src: ["**/*.coffee"]
         dest: "public/js/modules/"
         ext: ".js"
@@ -13,12 +13,12 @@ module.exports = (grunt) ->
     jade:
       compile:
         files:
-          "public/index.html": "src/jade/index.jade"
+          "public/index.html": "client/jade/index.jade"
 
     stylus:
       compile:
         files:
-          "public/css/styles.css": "src/stylus/*.styl"
+          "public/css/styles.css": "client/stylus/*.styl"
 
         options:
           compress: true
@@ -31,15 +31,15 @@ module.exports = (grunt) ->
 
     watch:
       coffee:
-        files: ["src/coffee/**/*.coffee"]
+        files: ["client/coffee/**/*.coffee"]
         tasks: ["coffee"]
 
       stylus:
-        files: ["src/stylus/*.styl"]
+        files: ["client/stylus/*.styl"]
         tasks: ["stylus"]
 
       jade:
-        files: ["src/jade/*.jade"]
+        files: ["client/jade/*.jade"]
         tasks: ["jade"]
 
   grunt.loadNpmTasks "grunt-contrib-coffee"
