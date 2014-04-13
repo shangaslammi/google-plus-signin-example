@@ -17,12 +17,18 @@ window.signinCallback = (authResult) ->
     console.log 'Sign-in state: ', authResult['error']
 
 define (require) ->
+  $    = require('jquery')
   gapi = require('gapi')
 
-  console.log gapi
+  requestSession = () -> $.ajax
+    accepts: "json"
+    type: "PUT"
+    url: "/api/session"
 
-  gapi.signin.render "signinButton",
-    clientid: "764745625437-2b2lo6jusqkoc0lboumg50ned3tbqi0g.apps.googleusercontent.com"
-    scope: "profile"
-    cookiepolicy: "single_host_origin"
-    callback: "signinCallback"
+  requestSession().then (res) ->
+
+    gapi.signin.render "signinButton",
+      clientid: res.clientId
+      scope: "profile"
+      cookiepolicy: "single_host_origin"
+      callback: "signinCallback"

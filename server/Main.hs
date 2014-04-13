@@ -2,6 +2,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Main where
 
@@ -15,6 +16,7 @@ import Data.ByteString (ByteString)
 import qualified Data.ByteString.Lazy  as BL
 import qualified Data.ByteString.Char8 as BSC
 
+import Control.Monad ((>=>))
 import Control.Monad.Trans.Class (lift)
 
 import Control.Error
@@ -37,14 +39,28 @@ instance FromJSON OAuthConfig where
         options = defaultOptions
             { fieldLabelModifier = \s -> fromMaybe s $ stripPrefix "oauth" s }
 
-exampleApp :: ScottyM ()
-exampleApp = do
-    middleware (staticPolicy $ addBase "public")
+exampleApp :: OAuth2 -> IO (ScottyM ())
+exampleApp (OAuth2{..}) = do
 
-    get "/" $ file "public/index.html"
+    return $ do
+        middleware (staticPolicy $ addBase "public")
+
+        get "/" $ file "public/index.html"
+
+        put "/api/session" $ do
+            sid <- newSessionId
+            json $ object
+                [ "sessionToken" .= sid
+                , "clientId"     .= BSC.unpack oauthClientId
+                ]
+
+    where
+        newSessionId = return ("foo" :: String)
+
 
 runServer :: OAuth2 -> IO ()
-runServer oauth = scottyApp exampleApp >>= runTLS tlsCfg warpCfg where
+runServer = exampleApp >=> scottyApp >=> runTLS tlsCfg warpCfg where
+
     tlsCfg = defaultTlsSettings
         { certFile = "cert/server.crt"
         , keyFile  = "cert/server.key"
