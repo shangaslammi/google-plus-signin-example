@@ -16,7 +16,7 @@
     "grunt-shell-spawn": "~0.3.0"
   },
   "scripts": {
-    "prepublish": "bower install",
+    "prepublish": "bower install && cabal update && cabal install --only-dependencies",
     "start": "grunt"
   }
 }
