@@ -1,4 +1,3 @@
-
 # Google+ Sign-in Example using Haskell and Scotty
 
 You need [node.js](http://nodejs.org/) for compiling the client-side assets and
@@ -21,3 +20,5 @@ To install all library dependencies, run
 To start the server run
 
     npm start
+
+By default the test page will be accessible at https://localhost:3000/ .
