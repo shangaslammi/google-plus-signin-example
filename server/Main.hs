@@ -79,7 +79,7 @@ main = eitherT errLn runServer (readCfg >>= parseCfg) where
 
     fileMissing _ = unlines
             [ "Can't open the 'key.json' file."
-            , "Create one according to 'key.sample.json' file."
+            , "Create one according to the 'key.sample.json' file."
             ]
 
     parseCfg cfgFile = case eitherDecode cfgFile of
