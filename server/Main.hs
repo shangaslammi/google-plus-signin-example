@@ -38,10 +38,8 @@ exampleApp (oauth@OAuth2{..}) = do
 
     get "/" $ file "public/index.html"
 
-    get "/api/clientid" $ do
-        json $ object
-            [ "clientId" .= BSC.unpack oauthClientId
-            ]
+    get "/api/clientid" $ json $ object
+        [ "clientId" .= BSC.unpack oauthClientId ]
 
     post "/api/login" $ do
         LoginRequest code <- jsonData
