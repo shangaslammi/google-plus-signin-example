@@ -23,11 +23,15 @@ module.exports = (grunt) ->
         options:
           compress: true
 
-    connect:
+    shell:
       server:
         options:
-          port: 3000
-          base: 'public'
+          async: true
+          failOnError: true
+          stdout: true
+          stderr: true
+        command: 'runghc -iserver -package-db=`echo .cabal-sandbox/*.d` Main'
+
 
     watch:
       coffee:
@@ -46,7 +50,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks "grunt-contrib-jade"
   grunt.loadNpmTasks "grunt-contrib-stylus"
   grunt.loadNpmTasks "grunt-contrib-watch"
-  grunt.loadNpmTasks "grunt-contrib-connect"
+  grunt.loadNpmTasks "grunt-shell-spawn"
 
-  grunt.registerTask "default", ["coffee", "jade", "stylus", "connect", "watch"]
+  grunt.registerTask "default", ["coffee", "jade", "stylus", "shell:server", "watch"]
   grunt.registerTask "build", ["coffee", "jade", "stylus"]
