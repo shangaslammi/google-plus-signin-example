@@ -9,26 +9,45 @@ require.config
     gapi:
       exports: 'gapi'
 
-window.signinCallback = (authResult) ->
-  if (authResult['status']['signed_in'])
-    console.log "signed in", authResult
-    document.getElementById('gSigninWrapper').setAttribute('style', 'display: none')
-  else
-    console.log 'Sign-in state: ', authResult['error']
 
 define (require) ->
   $    = require('jquery')
+  ko   = require('knockout')
   gapi = require('gapi')
 
-  requestSession = () -> $.ajax
-    accepts: "json"
-    type: "PUT"
-    url: "/api/session"
+  ko.applyBindings new ->
+    @userinfo   = ko.observable()
+    @triedLogin = ko.observable false
+    @loginError = ko.observable null
 
-  requestSession().then (res) ->
+    login = (code) -> $.ajax
+      type: "POST"
+      url:  "/api/login"
+      data: JSON.stringify {code: code}
 
-    gapi.signin.render "signinButton",
-      clientid: res.clientId
-      scope: "profile"
-      cookiepolicy: "single_host_origin"
-      callback: "signinCallback"
+    window.signinCallback = (authResult) =>
+      if (authResult['status']['signed_in'])
+        @loginError null
+
+        # Send the auth code to the server which uses it to
+        # log in the user and query the user's info from Google.
+        login(authResult['code']).then (res) =>
+          @triedLogin true
+          @userinfo res.userinfo
+      else
+        @triedLogin true
+        @loginError authResult['error']
+
+    requestClientId = () -> $.ajax
+      accepts: "json"
+      type: "GET"
+      url: "/api/clientid"
+
+    requestClientId().then (res) ->
+      gapi.signin.render "signinButton",
+        clientid: res.clientId
+        scope: "profile"
+        cookiepolicy: "single_host_origin"
+        callback: "signinCallback"
+
+    return this

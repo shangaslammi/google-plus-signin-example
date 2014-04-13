@@ -10,8 +10,19 @@ html
 body
   h1 Google+ Sign-in Example
 
-  p Sign in with the button below
+  .loading(data-bind='visible: !triedLogin()') Loading...
 
-  #gSigninWrapper
-    #signinButton
+  .sign-in(data-bind='css: {visible: triedLogin() && !userinfo()}')
+    p Sign in with the button below
+
+    #gSigninWrapper
+      #signinButton
+
+  .signed-in(data-bind='css: {visible: userinfo}, with: userinfo')
+    p
+      span Signed in as:
+      span.userinfo
+        span.name(data-bind='text: name')
+        span.picture
+          img(data-bind='attr: {src: picture}')
 
