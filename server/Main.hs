@@ -31,41 +31,40 @@ import qualified Network.Wai.Handler.Warp as Warp
 
 newtype LoginRequest = LoginRequest ByteString
 
-exampleApp :: OAuth2 -> IO (ScottyM ())
+exampleApp :: OAuth2 -> ScottyM ()
 exampleApp (oauth@OAuth2{..}) = do
 
-    return $ do
-        middleware (staticPolicy $ addBase "public")
+    middleware (staticPolicy $ addBase "public")
 
-        get "/" $ file "public/index.html"
+    get "/" $ file "public/index.html"
 
-        get "/api/clientid" $ do
-            json $ object
-                [ "clientId" .= BSC.unpack oauthClientId
+    get "/api/clientid" $ do
+        json $ object
+            [ "clientId" .= BSC.unpack oauthClientId
+            ]
+
+    post "/api/login" $ do
+        LoginRequest code <- jsonData
+
+        eitherT errorJson json $ do
+            -- Exchange the authentication code from the client to
+            -- an OAuth token.
+            t    <- eitherIO $ fetchAccessToken oauth code
+
+            -- Use the OAuth token to fetch user info.
+            info <- eitherIO $
+                    authGetJSON t "https://www.googleapis.com/oauth2/v1/userinfo"
+
+            -- Return userinfo to the client.
+            return $ object
+                [ "userinfo" .= (info :: Value)
                 ]
-
-        post "/api/login" $ do
-            LoginRequest code <- jsonData
-
-            eitherT errorJson json $ do
-                -- Exchange the authentication code from the client to
-                -- an OAuth token.
-                t    <- eitherIO $ fetchAccessToken oauth code
-
-                -- Use the OAuth token to fetch user info.
-                info <- eitherIO $
-                        authGetJSON t "https://www.googleapis.com/oauth2/v1/userinfo"
-
-                -- Return userinfo to the client.
-                return $ object
-                    [ "userinfo" .= (info :: Value)
-                    ]
-            where
-                errorJson = json . object . return . ("error" .=) . BL.unpack
-                eitherIO  = EitherT . liftIO
+        where
+            errorJson = json . object . return . ("error" .=) . BL.unpack
+            eitherIO  = EitherT . liftIO
 
 runServer :: OAuth2 -> IO ()
-runServer = exampleApp >=> scottyApp >=> runTLS tlsCfg warpCfg where
+runServer = scottyApp . exampleApp >=> runTLS tlsCfg warpCfg where
 
     tlsCfg = defaultTlsSettings
         { certFile = "cert/server.crt"
