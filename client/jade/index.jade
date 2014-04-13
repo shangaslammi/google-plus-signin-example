@@ -1,25 +1,9 @@
 doctype html
 html
   head
-
-    script(type='text/javascript').
-      (function () {
-        var po = document.createElement('script');
-        po.type = 'text/javascript';
-        po.async = true;
-        po.src = 'https://plus.google.com/js/client:plusone.js';
-        var s = document.getElementsByTagName('script')[0];
-        s.parentNode.insertBefore(po, s);
-      })();
-
     meta(charset='UTF-8')
     link(rel='stylesheet', type='text/css', href="css/styles.css")
     title Google+ Sign-in Example
-
-  meta(name="google-signin-clientid", content="764745625437-2b2lo6jusqkoc0lboumg50ned3tbqi0g.apps.googleusercontent.com")
-  meta(name="google-signin-scope", content="profile")
-  meta(name="google-signin-cookiepolicy", content="single_host_origin")
-  meta(name="google-signin-callback", content="signinCallback")
 
   script(type='text/javascript', src='js/vendor/requirejs/require.js', data-main='js/modules/app.js')
 
@@ -28,6 +12,6 @@ body
 
   p Sign in with the button below
 
-  #gSignInWrapper
-    #signInButton
+  #gSigninWrapper
+    #signinButton
 
