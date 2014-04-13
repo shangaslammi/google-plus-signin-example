@@ -2,3 +2,4 @@ node_modules
 .cabal-sandbox
 dist
 key.json
+cabal.sandbox.config
