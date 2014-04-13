@@ -1,0 +1,7 @@
+{
+    "ClientId":            "xxxxxxxxxxxxxxx.apps.googleusercontent.com",
+    "ClientSecret":        "xxxxxxxxxxxxxxxxxxxxxx",
+    "Callback":            "http://localhost:3000/googleCallback",
+    "OAuthorizeEndpoint":  "https://accounts.google.com/o/oauth2/auth",
+    "AccessTokenEndpoint": "https://accounts.google.com/o/oauth2/token"
+}
