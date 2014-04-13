@@ -1,5 +1,6 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE LambdaCase #-}
 
 module Main where
 
@@ -12,6 +13,9 @@ import Network.OAuth.OAuth2 (OAuth2(..))
 import Data.ByteString (ByteString)
 import qualified Data.ByteString.Lazy  as BL
 import qualified Data.ByteString.Char8 as BSC
+
+import Control.Error.Util
+import Control.Monad.Trans.Either
 
 newtype OAuthConfig = OAuthConfig { getOAuth2 :: OAuth2 } deriving Show
 
@@ -26,7 +30,16 @@ instance FromJSON OAuthConfig where
             { fieldLabelModifier = \s -> fromMaybe s $ stripPrefix "oauth" s }
 
 main :: IO ()
-main = do
-    cfgFile <- BL.readFile "key.sample.json"
-    let cfg = eitherDecode cfgFile :: Either String OAuthConfig
-    print cfg
+main = eitherT fileMissing parseCfg readCfg where
+
+    readCfg = tryIO $ BL.readFile "key.json"
+
+    fileMissing _ = do
+        errLn "Can't open the 'key.json' file."
+        errLn "Create one according to 'key.sample.json' file."
+
+    parseCfg cfgFile = case eitherDecode cfgFile of
+        Left e -> do
+            errLn "Error parsing 'key.json':"
+            errLn e
+        Right (OAuthConfig oauth) -> print oauth

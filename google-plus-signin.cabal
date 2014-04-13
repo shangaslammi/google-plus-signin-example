@@ -24,6 +24,8 @@ executable google-signin-test
     , bytestring
     , aeson   == 0.7.*
     , hoauth2 == 0.3.*
+    , errors  == 1.*
+    , either  == 4.*
 
   -- hs-source-dirs:
   default-language:    Haskell2010
